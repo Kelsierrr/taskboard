@@ -1,12 +1,12 @@
 "use client";
 
+import { Suspense } from "react";
 import * as React from "react";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
@@ -54,9 +54,26 @@ const PasswordField = React.forwardRef<HTMLInputElement, PasswordFieldProps>(
 );
 PasswordField.displayName = "PasswordField";
 
+// Wrapper component with Suspense
 export default function AuthPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen flex items-center justify-center p-4">
+          <p className="text-sm text-muted-foreground">Loading…</p>
+        </main>
+      }
+    >
+      <AuthPageInner />
+    </Suspense>
+  );
+}
+
+// Inner component that actually uses useSearchParams, forms, etc.
+function AuthPageInner() {
   const router = useRouter();
   const params = useSearchParams();
+
   const initialTab = (params.get("tab") === "register" ? "register" : "login") as
     | "login"
     | "register";
@@ -80,7 +97,7 @@ export default function AuthPage() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    watch
+    watch,
   } = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -97,9 +114,9 @@ export default function AuthPage() {
       await api("/auth/login", { method: "POST", body: data });
       router.push("/dashboard");
     } catch (e: any) {
-     const msg = e?.message?.toLowerCase?.().includes("fetch")
-     ? "Couldn’t reach the server, please try again."
-     : e?.message || "Login failed";
+      const msg = e?.message?.toLowerCase?.().includes("fetch")
+        ? "Couldn’t reach the server, please try again."
+        : e?.message || "Login failed";
       alert(msg);
     }
   };
@@ -123,12 +140,18 @@ export default function AuthPage() {
             </div>
             <h1 className="text-2xl font-bold">TaskBoard</h1>
           </div>
-          <p className="text-sm text-muted-foreground">Modern team project management</p>
+          <p className="text-sm text-muted-foreground">
+            Modern team project management
+          </p>
         </div>
 
         {/* Keep card height consistent with a single min-height wrapper */}
         <div className="mt-2 min-h-[420px]">
-          <Tabs value={tab} onValueChange={(v) => setTab(v as any)} className="w-full h-full">
+          <Tabs
+            value={tab}
+            onValueChange={(v) => setTab(v as "login" | "register")}
+            className="w-full h-full"
+          >
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="login">Sign In</TabsTrigger>
               <TabsTrigger value="register">Create Account</TabsTrigger>
@@ -141,7 +164,9 @@ export default function AuthPage() {
                   <Label htmlFor="login-email">Email</Label>
                   <Input id="login-email" type="email" {...loginRegister("email")} />
                   {loginErrors.email && (
-                    <p className="text-xs text-destructive">{loginErrors.email.message}</p>
+                    <p className="text-xs text-destructive">
+                      {loginErrors.email.message}
+                    </p>
                   )}
                 </div>
 
@@ -149,11 +174,16 @@ export default function AuthPage() {
                   <Label htmlFor="login-password">Password</Label>
                   <PasswordField id="login-password" {...loginRegister("password")} />
                   {loginErrors.password && (
-                    <p className="text-xs text-destructive">{loginErrors.password.message}</p>
+                    <p className="text-xs text-destructive">
+                      {loginErrors.password.message}
+                    </p>
                   )}
                   {/* right-aligned forgot link */}
                   <div className="flex justify-end">
-                    <a href="/forgot-password" className="text-sm text-primary hover:underline">
+                    <a
+                      href="/forgot-password"
+                      className="text-sm text-primary hover:underline"
+                    >
                       Forgot Password?
                     </a>
                   </div>
@@ -171,31 +201,43 @@ export default function AuthPage() {
                 <div className="space-y-2">
                   <Label htmlFor="name">Full name</Label>
                   <Input id="name" {...register("name")} />
-                  {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
+                  {errors.name && (
+                    <p className="text-xs text-destructive">{errors.name.message}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <Input id="email" type="email" {...register("email")} />
-                  {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
+                  {errors.email && (
+                    <p className="text-xs text-destructive">{errors.email.message}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="password">Password</Label>
                   <PasswordField id="password" {...register("password")} />
-                  {registerPasswordWatch && registerPasswordWatch.length > 0 && registerPasswordWatch.length < 8 && (
-  <p className="text-xs text-destructive">At least 8 characters</p>
-)}
-{errors.password && (
-  <p className="text-xs text-destructive">{errors.password.message}</p>
-)}
+                  {registerPasswordWatch &&
+                    registerPasswordWatch.length > 0 &&
+                    registerPasswordWatch.length < 8 && (
+                      <p className="text-xs text-destructive">
+                        At least 8 characters
+                      </p>
+                    )}
+                  {errors.password && (
+                    <p className="text-xs text-destructive">
+                      {errors.password.message}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="confirm">Confirm password</Label>
                   <PasswordField id="confirm" {...register("confirm")} />
                   {errors.confirm && (
-                    <p className="text-xs text-destructive">{errors.confirm.message}</p>
+                    <p className="text-xs text-destructive">
+                      {errors.confirm.message}
+                    </p>
                   )}
                 </div>
 
