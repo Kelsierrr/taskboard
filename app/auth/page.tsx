@@ -87,8 +87,8 @@ function AuthPageInner() {
   } = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "demo@taskboard.com",
-      password: "password123",
+      email: "",
+      password: "",
     },
   });
 
@@ -101,9 +101,9 @@ function AuthPageInner() {
   } = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      name: "Demo User",
-      email: "demo@taskboard.com",
-      password: "password123",
+      name: "",
+      email: "",
+      password: "",
       confirm: "",
     },
   });
@@ -162,7 +162,7 @@ function AuthPageInner() {
               <form onSubmit={handleLoginSubmit(onLogin)} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="login-email">Email</Label>
-                  <Input id="login-email" type="email" {...loginRegister("email")} />
+                  <Input id="login-email" type="email" placeholder="your@email.com" {...loginRegister("email")} />
                   {loginErrors.email && (
                     <p className="text-xs text-destructive">
                       {loginErrors.email.message}
@@ -172,7 +172,7 @@ function AuthPageInner() {
 
                 <div className="space-y-2">
                   <Label htmlFor="login-password">Password</Label>
-                  <PasswordField id="login-password" {...loginRegister("password")} />
+                  <PasswordField id="login-password" placeholder="Enter your password here" {...loginRegister("password")} />
                   {loginErrors.password && (
                     <p className="text-xs text-destructive">
                       {loginErrors.password.message}
@@ -200,7 +200,7 @@ function AuthPageInner() {
               <form onSubmit={handleSubmit(onRegister)} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Full name</Label>
-                  <Input id="name" {...register("name")} />
+                  <Input id="name" placeholder="Enter Your Name" {...register("name")} />
                   {errors.name && (
                     <p className="text-xs text-destructive">{errors.name.message}</p>
                   )}
@@ -208,7 +208,7 @@ function AuthPageInner() {
 
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" {...register("email")} />
+                  <Input id="email" type="email" placeholder="Your@email.com" {...register("email")} />
                   {errors.email && (
                     <p className="text-xs text-destructive">{errors.email.message}</p>
                   )}
@@ -216,7 +216,7 @@ function AuthPageInner() {
 
                 <div className="space-y-2">
                   <Label htmlFor="password">Password</Label>
-                  <PasswordField id="password" {...register("password")} />
+                  <PasswordField id="password" placeholder="Choose a password" {...register("password")} />
                   {registerPasswordWatch &&
                     registerPasswordWatch.length > 0 &&
                     registerPasswordWatch.length < 8 && (
@@ -233,7 +233,7 @@ function AuthPageInner() {
 
                 <div className="space-y-2">
                   <Label htmlFor="confirm">Confirm password</Label>
-                  <PasswordField id="confirm" {...register("confirm")} />
+                  <PasswordField id="confirm" placeholder="Re-enter password" {...register("confirm")} />
                   {errors.confirm && (
                     <p className="text-xs text-destructive">
                       {errors.confirm.message}
